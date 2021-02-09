@@ -1,0 +1,53 @@
+version: "3.5"
+services:
+
+  es-eshop:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    container_name: es-eshop
+    environment:
+      - node.name=es-eshop
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - "E:/docker_volume/es-eshop:/usr/share/elasticsearch/data"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - elastic
+
+  kib-eshop:
+    image: docker.elastic.co/kibana/kibana:7.10.0
+    container_name: kib-eshop
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://es-eshop:9200
+      ELASTICSEARCH_HOSTS: http://es-eshop:9200
+    networks:
+      - elastic
+    depends_on:
+        - es-eshop
+
+  app-eshop:
+    image: "e-tech-store-scrapy:1.0"
+#    build: .
+    container_name: app-eshop
+    environment:
+      ELASTICSEARCH_HOSTS: http://es-eshop:9200
+#    command: "python ./eTechStore/main.py"
+#    volumes:
+#    - "E:/docker_volume/app-eshop:/eTechStore"
+    networks:
+      - elastic
+    depends_on:
+        - es-eshop
+
+networks:
+  elastic:
+    driver: bridge
