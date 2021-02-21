@@ -1,11 +1,11 @@
 version: "3.5"
 services:
 
-  es-eshop:
+  es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
-    container_name: es-eshop
+    container_name: es
     environment:
-      - node.name=es-eshop
+      - node.name=es
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -21,32 +21,32 @@ services:
     networks:
       - elastic
 
-  kib-eshop:
+  kib:
     image: docker.elastic.co/kibana/kibana:7.10.0
-    container_name: kib-eshop
+    container_name: kib
     ports:
       - 5601:5601
     environment:
-      ELASTICSEARCH_URL: http://es-eshop:9200
-      ELASTICSEARCH_HOSTS: http://es-eshop:9200
+      ELASTICSEARCH_URL: http://es:9200
+      ELASTICSEARCH_HOSTS: http://es:9200
     networks:
       - elastic
     depends_on:
-        - es-eshop
+        - es
 
-  app-eshop:
+  app:
     image: "e-tech-store-scrapy:1.0"
 #    build: .
-    container_name: app-eshop
+    container_name: app
     environment:
-      ELASTICSEARCH_HOSTS: http://es-eshop:9200
+      ELASTICSEARCH_HOSTS: http://es:9200
 #    command: "python ./eTechStore/main.py"
 #    volumes:
 #    - "E:/docker_volume/app-eshop:/eTechStore"
     networks:
       - elastic
     depends_on:
-        - es-eshop
+        - es
 
 networks:
   elastic:
