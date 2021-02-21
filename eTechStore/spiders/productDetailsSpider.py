@@ -1,15 +1,7 @@
 import scrapy
-from scrapy.crawler import CrawlerProcess
 from eTechStore.items import ETechStoreItem
-from eTechStore.db_api import SqlAlchemy
-from eTechStore import general
 import chompjs
 import codecs
-import pprint
-import datetime
-import time
-import os
-from scrapy.utils.project import get_project_settings
 
 def parse_product_details_anhoch(response):
 
@@ -27,7 +19,6 @@ def parse_product_details_anhoch(response):
     price = price.replace(",", "") if price else 0.0
     if price and price.isdigit():
         price = float(price)
-    # currency = currency.strip(".")
 
     lst_desc = product_info_sec.xpath(
         "//div[@class='product-desc']//text()[not(ancestor::div/@class='modal hide fade')][//br]").getall()
@@ -44,7 +35,6 @@ def parse_product_details_anhoch(response):
         if name_.startswith("Достапност:"):
             pass
 
-    # lst_desc = product_sel.xpath("//div[@class='description']//div[@class='tab-content']//div[@id='description']//div[@class='span8 clearfix']//text()").getall()
     lst_desc = product_sel.xpath(
         "//div[@class='description']//div[@class='tab-content']//div[@id='description']//div[@class='span8 clearfix']/pre//text()").getall()
     lst_desc = [item_.strip() for item_ in lst_desc if item_.strip()]
@@ -182,7 +172,6 @@ class ProductDetailsSpider(scrapy.Spider):
     allowed_domains = ['anhoch.com', 'neptun.mk', 'setec.mk']
 
     custom_settings = {
-        # 'JOBDIR': general.get_log_dir(name),
         'ITEM_PIPELINES': {
             'eTechStore.pipelines.ElasticSearchPipeline': 400,
         },
@@ -191,39 +180,12 @@ class ProductDetailsSpider(scrapy.Spider):
         }
     }
 
-    # def __init__(self, *args, **kwargs):
-    #     super(self.__class__, self).__init__(*args, **kwargs)
-    #
-    #     self.db_api = SqlAlchemy(db_url=self.custom_settings.get("DB_URL"))
-
-    # def start_requests(self):
-    #     # lst_new_items = general.read_file_lines(general.FILE_NEW_ITEMS)
-    #     lst_new_items = [url_obj.url for url_obj in self.db_api.get_new_urls()]
-    #     if lst_new_items:
-    #         for line_ in lst_new_items:
-    #             yield scrapy.Request(line_, callback=self.parse_product_details, dont_filter=True)
-
-    # @classmethod
-    # def from_crawler(cls, crawler, *args, **kwargs):
-    #     print (crawler.settings.get("DB_URL"))
-    #     spider = super().from_crawler(crawler, *args, **kwargs)
-    #     return spider
-
     def parse(self, response, **kwargs):
         yield self.parse_product_details(response)
 
     def parse_product_details(self, response):
 
         this_url = response.request.url
-
-        # if response.status == 200:
-
-        # lst_new_items = [line.strip() for line in open(general.FILE_NEW_ITEMS, 'r').readlines() if line.strip()]
-        # if this_url in lst_new_items:
-        #     lst_new_items.remove(this_url)
-        #     general.write_file(general.FILE_NEW_ITEMS, "\n".join(lst_new_items), "w+")
-
-        # base_url = f"{this_url}".split("/")[0]
 
         eTechStoreItem = ETechStoreItem()
 
@@ -235,8 +197,3 @@ class ProductDetailsSpider(scrapy.Spider):
             eTechStoreItem = parse_product_details_setec(response)
 
         return eTechStoreItem
-
-# if __name__ == "__main__":
-#     process =  CrawlerProcess()
-#     process.crawl(ProductDetailsSpider)
-#     process.start()
