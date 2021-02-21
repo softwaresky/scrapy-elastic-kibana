@@ -36,7 +36,9 @@ services:
 
   app:
     image: "e-tech-store-scrapy:1.0"
-#    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: app
     environment:
       ELASTICSEARCH_HOSTS: http://es:9200
