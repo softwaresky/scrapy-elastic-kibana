@@ -1,17 +1,12 @@
 import scrapy
-from eTechStore.items import ETechStoreItem, UrlItem
-from scrapy.crawler import CrawlerProcess
-from eTechStore import general
-import pprint
+from eTechStore.items import UrlItem
 
 class SetecSpider(scrapy.Spider):
 
     name = 'setecSpider'
     allowed_domains = ['setec.mk']
     start_urls = ['https://setec.mk']
-
     custom_settings = {
-        # 'JOBDIR': general.get_log_dir(name),
         'ITEM_PIPELINES': {
             'eTechStore.pipelines.UrlManagerPipeline': 300,
         }
@@ -36,8 +31,3 @@ class SetecSpider(scrapy.Spider):
             href = tag_a_.attrib["href"] if "href" in tag_a_.attrib else ""
             if href and tag_a_.xpath("./text()").get() == ">":
                 yield scrapy.Request(href, callback=self.parse_category_products)
-
-# if __name__ == "__main__":
-#     process =  CrawlerProcess()
-#     process.crawl(SetecSpider)
-#     process.start()
