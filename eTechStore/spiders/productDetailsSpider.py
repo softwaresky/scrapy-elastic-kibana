@@ -46,7 +46,7 @@ def parse_product_details_anhoch(response):
     dict_item = {}
     dict_item["id"] = f'{market_name}-{code}'
     dict_item['brand'] = brand.title()
-    dict_item['product_name'] = product_name.strip().replace("Notebook ") if product_name else ""
+    dict_item['product_name'] = product_name.strip().replace("Notebook ", "") if product_name else ""
     dict_item['categories_path'] = lst_category_path
     dict_item['price'] = price
     dict_item['description'] = description
