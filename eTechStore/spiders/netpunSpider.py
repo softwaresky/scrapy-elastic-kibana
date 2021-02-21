@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from scrapy.crawler import CrawlerProcess
-from eTechStore.items import ETechStoreItem, UrlItem
-from eTechStore import general
+from eTechStore.items import UrlItem
 import chompjs
 import codecs
 from urllib.parse import urlencode, urljoin
-import pprint
 
 class NetpunSpider(scrapy.Spider):
 
@@ -63,32 +60,8 @@ class NetpunSpider(scrapy.Spider):
                 urlItem["url"] = link_
                 yield urlItem
 
-            # for dict_product_ in dict_data["Products"]:
-            #     rel_url = dict_product_["Url"]
-            #     href = f"{response.request.url}/{rel_url}"
-            #     href = f"{base_url}/{rel_url}"
-            #     yield response.follow(rel_url, callback=self.parse_category_products)
-
             if page_count > 1:
                 for i in range(2, page_count + 1):
                     dict_form_data["page"] = i
                     href = f"{base_url}?{urlencode(dict_form_data)}"
                     yield scrapy.Request(href, callback=self.parse_category_products)
-
-
-# if __name__ == "__main__":
-#     dict_settings = {
-#         'USER_AGENT': 'eShop (+http://www.mydomain.com)',
-#         # 'LOG_LEVEL': 'INFO',
-#         'ROBOTSTXT_OBEY': True,
-#         'COMPRESSION_ENABLED': False,
-#         'CONCURRENT_REQUESTS': 1,
-#         'AUTOTHROTTLE_ENABLED': True
-#
-#     }
-#
-#     process =  CrawlerProcess(dict_settings)
-#     process.crawl(NetpunSpider)
-#     process.start()
-
-
